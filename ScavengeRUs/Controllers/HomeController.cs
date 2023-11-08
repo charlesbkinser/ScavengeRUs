@@ -5,7 +5,7 @@ using ScavengeRUs.Models;
 using ScavengeRUs.Models.Entities;
 using ScavengeRUs.Services;
 using System.Diagnostics;
-
+//this is a comment
 namespace ScavengeRUs.Controllers
 {
     public class HomeController : Controller
