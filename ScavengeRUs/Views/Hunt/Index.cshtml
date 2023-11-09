@@ -30,7 +30,7 @@
                 @Html.DisplayNameFor(model => model.EndDate)
             </th>
             <th>
-                Time Remaining
+                Status
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Players)
@@ -61,14 +61,23 @@
             </td>
             <td>
                     @{
+                        // see the commented code below to see why this var is set up this way, even though you don't necessarily need it this way in this version of the project 
                         var timeRemaining = (item.EndDate - DateTime.Now).ToString();
-                        if (TimeSpan.Parse(timeRemaining).Seconds<0)
+
+                        if (item.StartDate < DateTime.Now || item.EndDate < DateTime.Now)
                         {
                             timeRemaining = "Ended";
                         }
-                        else
+                        if (item.StartDate > DateTime.Now)
                         {
-                            timeRemaining = timeRemaining.Substring(0, timeRemaining.LastIndexOf("."));
+                            timeRemaining = "Pending";
+                        }
+                        else if(item.EndDate > DateTime.Now)
+                        {
+                            timeRemaining = "Active";
+
+                            // below would display the time remaining, but we are choosing to not use it.
+                            // timeRemaining = timeRemaining.Substring(0, timeRemaining.LastIndexOf("."));
                         }
                 }
                     @Html.DisplayFor(modelItem => timeRemaining)

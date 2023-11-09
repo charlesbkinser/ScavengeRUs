@@ -8,6 +8,15 @@
 
 <div>
     <hr />
+    @* // If uncommented will display the user ID in the details page. Potentially useful for certain troubleshooting scenarios, but otherwise should probably just remain hidden.
+
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd> *@
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Email)
@@ -19,7 +28,7 @@
             Name
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.FirstName) @Html.DisplayNameFor(model => model.LastName)
+            @Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)
         </dd>
         <dt class="col-sm-2">
             Phone Number
