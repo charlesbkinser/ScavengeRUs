@@ -328,5 +328,9 @@ namespace ScavengeRUs.Controllers
             _huntRepo.Update(id, hunt);
             return RedirectToAction("Index");
         }
+        public IActionResult TeamPage()
+        {
+            return View();
+        }
     }
 }
