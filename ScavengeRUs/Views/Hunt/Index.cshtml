@@ -80,7 +80,8 @@
                 @Html.DisplayFor(modelItem => item.HuntLocations.Count)
             </td>
             <td>
-                    @{
+                    @{  
+                        // If a hunt is ended, make sure you can not edit it.
                         var timeRemaining2 = (item.EndDate - DateTime.Now).ToString();
                         if (TimeSpan.Parse(timeRemaining2).Seconds > 0)
                         {
