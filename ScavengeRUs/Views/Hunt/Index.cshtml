@@ -33,11 +33,15 @@
                 Time Remaining
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.HuntStatus)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Players)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.HuntLocations)
             </th>
+            
             <th></th>
         </tr>
     </thead>
@@ -74,14 +78,34 @@
                     @Html.DisplayFor(modelItem => timeRemaining)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.HuntStatus)
+            
+                    @{
+                        var huntStatus = "";
+                        
+                        if (DateTime.Now < item.StartDate)
+                        {
+                            huntStatus = "Pending";
+                        }
+                        else if(DateTime.Now >= item.StartDate && DateTime.Now < item.EndDate)
+                        {
+                            huntStatus = "Active";
+                        }
+                        else
+                        {
+                            huntStatus = "Ended";
+                        }
+                        
+                    }
+                    @Html.DisplayFor(modelItem => huntStatus)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Players.Count)
              </td>
             <td>
                 @Html.DisplayFor(modelItem => item.HuntLocations.Count)
             </td>
             <td>
-                    @{  
-                        // If a hunt is ended, make sure you can not edit it.
                         var timeRemaining2 = (item.EndDate - DateTime.Now).ToString();
                         if (TimeSpan.Parse(timeRemaining2).Seconds > 0)
                         {
