@@ -106,6 +106,7 @@
                 @Html.DisplayFor(modelItem => item.HuntLocations.Count)
             </td>
             <td>
+                        @{
                         var timeRemaining2 = (item.EndDate - DateTime.Now).ToString();
                         if (TimeSpan.Parse(timeRemaining2).Seconds > 0)
                         {
