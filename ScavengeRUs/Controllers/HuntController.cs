@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 namespace ScavengeRUs.Controllers
 {
     /// <summary>
-    /// This class is the controller for any page realted to hunts
+    /// This class is the controller or any page realted to hunts
     /// </summary>
     public class HuntController : Controller
     {
