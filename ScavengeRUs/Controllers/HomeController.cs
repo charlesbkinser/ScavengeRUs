@@ -5,7 +5,7 @@ using ScavengeRUs.Models;
 using ScavengeRUs.Models.Entities;
 using ScavengeRUs.Services;
 using System.Diagnostics;
-
+//this is a comment
 namespace ScavengeRUs.Controllers
 {
     public class HomeController : Controller
@@ -73,6 +73,11 @@ namespace ScavengeRUs.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult CreateOrJoinTeam()
+        {
+            return View();
         }
     }
 }

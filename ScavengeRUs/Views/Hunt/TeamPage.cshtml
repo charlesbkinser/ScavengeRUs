@@ -1,0 +1,126 @@
+﻿@{
+    ViewData["Title"] = "Create or Join a Team";
+    //This page still needs the team name displayed at the top of the screen below the header, this
+    //is mentioned in the function below that pulls the team name.
+    
+    //This page also needs the table to display player names inside the table, there is a function
+    //for that as well that just needs the data inserted.
+
+    //The button on the page also needs logic to proceed to the current hunt.
+}
+
+<style>
+    /*Used to center table with player names.*/
+    .table1 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 75vh;
+    }
+
+    table {
+        display: table;
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    tr {
+        display: table-row;
+        border: 1px solid black;
+        padding: 10px;
+    }
+
+    td {
+        border: 1px solid black; 
+        padding: 10px; 
+        width: 25%; 
+    }
+
+    /*This is used to position the h1 and button on the screen.*/
+    .buttonH1Position {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between; 
+        padding: 10px;
+        z-index: 999; 
+    }
+
+ 
+</style>
+
+<body>
+
+    <div class="buttonH1Position">
+        @*This h1 element is filled in by a function below.*@
+        <h1 id="TeamName"></h1>
+        <button class="btn-primary">Proceed to Hunt</button>
+    </div>
+
+    <table class="table1">
+        @* As with the header above, these table cells are filled in by a function below.*@
+        <tr>
+            <td id="Player1"></td>
+            <td id="Player2"></td>
+            <td id="Player3"></td>
+            <td id="Player4"></td>
+        </tr>
+        <tr>
+            <td id="Player5">None</td>
+            <td id="Player6">None</td>
+            <td id="Player7">None</td>
+            <td id="Player8">None</td>
+        </tr>
+        <tr>
+            <td id="Player9">None</td>
+            <td id="Player10">None</td>
+            <td id="Player11">None</td>
+            <td id="Player12">None</td>
+        </tr>
+        <tr>
+            <td id="Player13">None</td>
+            <td id="Player14">None</td>
+            <td id="Player15">None</td>
+            <td id="Player16">None</td>
+        </tr>
+        <tr>
+            <td id="Player17">None</td>
+            <td id="Player18">None</td>
+            <td id="Player19">None</td>
+            <td id="Player20">None</td>
+        </tr>
+    </table>
+</body>
+
+<script>
+
+    function updateTeamHeading() {
+        // Get the team name from source
+        var teamName = "Team";
+
+        var headingElement = document.getElementById("TeamName");
+
+        // Update the h1 element's content with the team name
+        headingElement.textContent = "Team Name: " + teamName;
+    }
+    updateTeamHeading();
+
+    function updatePlayers() {
+        // This array is supposed to contain player names from another source.
+        var data = [];
+
+        // Update table cells with data
+        for (var i = 0; i < 32; i++) {
+            var playerId = "Player" + (i + 1); // This is used to create the playerID for each cell 
+            var tableCell = document.getElementById(playerId);
+            if (tableCell) {
+                tableCell.textContent = data[i] || "Player Slot"; // This updates table cells with either player names or default text.
+            }
+        }
+    }
+    updatePlayers();
+</script>
+
