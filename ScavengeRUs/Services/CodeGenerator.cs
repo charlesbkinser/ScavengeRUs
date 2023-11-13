@@ -30,7 +30,7 @@ public class CodeGenerator
     }
 
     /// <summary>
-    /// Generates a unique access code by combining a random word from the list above with a random number between 100 and 999 while ensuring that the code is unique.
+    /// Generates a unique access code by combining 2 random words from the list above with a random number between 100 and 9999 while ensuring that the code is unique.
     /// by checking the database to see if the code already exists.
     /// </summary>
     /// <returns>A unique access code.</returns>
