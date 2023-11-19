@@ -182,13 +182,23 @@ their location is within 50ft of a task.
     const createTaskModal = new bootstrap.Modal(createTaskModalDOM);
     const createTaskButton = document.querySelectorAll("#btnCreateTask");
 
+    // Function to update distances in the task list
+    function updateDistances(userCoords) {
+        createTaskButton.forEach(function (item) {
+            var taskLat = parseFloat($(item).data("lat"));
+            var taskLon = parseFloat($(item).data("lon"));
+            var distanceInMeters = distanceToLocation(userCoords, taskLat, taskLon);
+            var distanceInFeet = metresToFeet(distanceInMeters);
+
+            // Now can display the current distance from a task in feet next to the task itself
+            var distanceElement = item.querySelector('.distance-info');
+            distanceElement.textContent = distanceInFeet.toFixed(2) + ' feet';
+        });
+    }
+
+    // Attach click event to each task button
     createTaskButton.forEach(item => {
         item.addEventListener("click", event => {
-            var TaskId = $(item).data("id");
-            var HuntId = $(item).data("huntid");
-            var Task = $(item).data("task");
-
-            // Get the latitude and longitude of the task
             var taskLat = parseFloat($(item).data("lat"));
             var taskLon = parseFloat($(item).data("lon"));
 
@@ -197,13 +207,14 @@ their location is within 50ft of a task.
 
                 // Check if the user is within 50ft of the task
                 if (distance <= 50) {
+                    alert('You are within 50 feet of this task!')
                     // Set values in the modal
-                    $('#TaskIdInput').val(TaskId);
-                    $('#HuntIdInput').val(HuntId);
-                    $('#TaskInput').text(Task);
+                    $('#TaskIdInput').val($(item).data("id"));
+                    $('#HuntIdInput').val($(item).data("huntid"));
+                    $('#TaskInput').text($(item).data("task"));
 
                     // Show the modal only if the task is incomplete
-                    if ($('a[data-id="' + TaskId + '"] #status').text() == "Incomplete") {
+                    if ($('a[data-id="' + $(item).data("id") + '"] #status').text() == "Incomplete") {
                         createTaskModal.show();
                     }
                 } else {
@@ -213,9 +224,17 @@ their location is within 50ft of a task.
                 }
             }, function (error) {
                 console.error('Error getting user location:', error);
-                // Handle error, e.g., inform the user or retry
+                // Handle error
             });
         });
+    });
+
+    // Call updateDistances with user coordinates here
+    getLocationAsync(function (userCoords) {
+        updateDistances(userCoords);
+    }, function (error) {
+        console.error('Error getting user location:', error);
+        // Handle error, e.g., inform the user or retry
     });
 
 })();
@@ -223,6 +242,7 @@ their location is within 50ft of a task.
 //event listener
 document.addEventListener('DOMContentLoaded', function () {
     var taskItems = document.querySelectorAll('#btnCreateTask');
+
 
     taskItems.forEach(function (taskItem) {
         taskItem.addEventListener('click', function (event) {

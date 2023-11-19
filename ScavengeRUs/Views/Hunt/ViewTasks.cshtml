@@ -142,6 +142,16 @@
 
                             </div>
                         </div>
+                        
+                        <div class="col">
+                            <div class="row" id="taskdistance">
+                                <span>Distance</span>
+                            </div>
+                            <div class="row" id="taskbody">
+                                <span class="distance-info"></span>
+                            </div>
+                        </div>
+
                         <div class="col">
                             <div class="row" id="taskAnswer">
                                 <span class="completeBtn">Complete <i class="fa-solid fa-angle-right"></i></span>
@@ -186,35 +196,67 @@
 <!-- 
     Javascript code to determine of a user is within 50ft of a task.
     -->
+
 <script>
+    //Kept having issues with updateDistances function,
+    // needs to be defined outside of eventListener
+    function updateDistances(userCoords) {
+            taskItems.forEach(function (taskItem) {
+                var taskLat = parseFloat(taskItem.getAttribute('data-lat'));
+                var taskLon = parseFloat(taskItem.getAttribute('data-lon'));
+                var distanceInMeters = distanceToLocation(userCoords, taskLat, taskLon);
+                var distanceInFeet = metresToFeet(distanceInMeters);
+
+                // Now can display the current distance from a task in feet next to the task itself
+                var distanceElement = taskItem.querySelector('.distance-info');
+                distanceElement.textContent = distanceInFeet.toFixed(2) + ' feet';
+            });
+        }
     document.addEventListener('DOMContentLoaded', function () {
-    var taskItems = document.querySelectorAll('#btnCreateTask');
+        var taskItems = document.querySelectorAll('#btnCreateTask');
 
-    taskItems.forEach(function (taskItem) {
-        taskItem.addEventListener('click', function (event) {
-            var taskLat = parseFloat(taskItem.getAttribute('data-lat'));
-            var taskLon = parseFloat(taskItem.getAttribute('data-lon'));
+        
+        getLocationAsync(function (userCoords) {
+            // Handle the obtained user coordinates
+            console.log('User coordinates:', userCoords);
 
-            getLocationAsync(function (coords) {
-                var distance = distanceToLocation(coords, taskLat, taskLon);
+            // Call updateDistances with the obtained user coordinates
+            updateDistances(userCoords);
+        }, function (error) {
+            console.error('Error getting user location:', error);
+            // Handle error
+        });
 
-                if (distance <= 50) {
-                     // User is close enough to the task, allow them to answer
-                    // Show the modal or perform other actions
-                    Console.log("user is close enough to task.")
-                    $('#TaskIdInput').val(taskItem.getAttribute('data-id'));
-                    $('#HuntIdInput').val(taskItem.getAttribute('data-huntid'));
-                    $('#TaskInput').text(taskItem.getAttribute('data-task'));
-                    createTaskModal.show();
-                } else {
-                    // Inform the user that they are not close enough to the task
-                    console.log('You are not close enough to access this task.');
-                }
-            }, function (error) {
-                console.error('Error getting user location:', error);
-                // Handle error, e.g., inform the user or retry
+
+        taskItems.forEach(function (taskItem) {
+            taskItem.addEventListener('click', function (event) {
+                var taskLat = parseFloat(taskItem.getAttribute('data-lat'));
+                var taskLon = parseFloat(taskItem.getAttribute('data-lon'));
+
+                getLocationAsync(function (coords) {
+                    // Call updateDistances with user coordinates when available
+                    updateDistances(coords);
+
+                    var distance = distanceToLocation(coords, taskLat, taskLon);
+
+                    if (distance <= 50) {
+                        // User is close enough to the task, allow them to answer
+                        // Show the modal or perform other actions
+                        console.log("User is close enough to the task.");
+                        $('#TaskIdInput').val(taskItem.getAttribute('data-id'));
+                        $('#HuntIdInput').val(taskItem.getAttribute('data-huntid'));
+                        $('#TaskInput').text(taskItem.getAttribute('data-task'));
+                        createTaskModal.show();
+                    } else {
+                        // Inform the user that they are not close enough to the task
+                        console.log('You are not close enough to access this task.');
+                    }
+                }, function (error) {
+                    console.error('Error getting user location:', error);
+                    // Handle error, e.g., inform the user or retry
+                });
             });
         });
     });
-});
 </script>
+
