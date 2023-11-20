@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 namespace ScavengeRUs.Controllers
 {
     /// <summary>
-    /// This class is the controller for any page realted to hunts
+    /// This class is the controller for any page related to hunts
     /// </summary>
     public class HuntController : Controller
     {
@@ -54,9 +54,15 @@ namespace ScavengeRUs.Controllers
         {
             if (ModelState.IsValid)
             {
-                hunt.CreationDate = DateTime.Now;
-                await _huntRepo.CreateAsync(hunt);
-                return RedirectToAction("Index");
+                // This line will prevent the admin from creating a hunt that ends before it starts.
+                // However, it will not display an error message or warn the user 
+                if(hunt.StartDate < hunt.EndDate)
+                {
+                    hunt.CreationDate = DateTime.Now;
+                    await _huntRepo.CreateAsync(hunt);
+                    return RedirectToAction("Index");
+                }
+
             }
             return View(hunt);
            
