@@ -29,6 +29,10 @@ body {
     font-weight: bold;
     text-decoration: underline;
 }
+#taskdistance{
+    font-weight: bold;
+    text-decoration: underline;
+}
 #taskbody {
     position: relative;
 

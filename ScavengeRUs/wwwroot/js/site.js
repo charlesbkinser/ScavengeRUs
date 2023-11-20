@@ -173,63 +173,89 @@ sideBarClose.addEventListener('click', e => {
     document.getElementById("taskarea").style.marginRight = "0";
 });
 
-(function _homeIndexMain() {        //This function handles the modal on the hunt page
+/*
+Function to show the task modal for users to answer, modified to only allow users to answer questions when 
+their location is within 50ft of a task. 
+*/
+(function _homeIndexMain() {
     const createTaskModalDOM = document.querySelector("#createTaskModal");
     const createTaskModal = new bootstrap.Modal(createTaskModalDOM);
     const createTaskButton = document.querySelectorAll("#btnCreateTask");
- //   console.log(createTaskButton);
+
+    // Function to update distances in the task list
+    function updateDistances(userCoords) {
+        createTaskButton.forEach(function (item) {
+            var taskLat = parseFloat($(item).data("lat"));
+            var taskLon = parseFloat($(item).data("lon"));
+            var distanceInMeters = distanceToLocation(userCoords, taskLat, taskLon);
+            var distanceInFeet = metresToFeet(distanceInMeters);
+
+            // Now can display the current distance from a task in feet next to the task itself
+            var distanceElement = item.querySelector('.distance-info');
+            distanceElement.textContent = distanceInFeet.toFixed(2) + ' feet';
+        });
+    }
+
+    // Attach click event to each task button
     createTaskButton.forEach(item => {
         item.addEventListener("click", event => {
-            var TaskId = $(item).data("id");
-            var HuntId = $(item).data("huntid");
-            var Task = $(item).data("task");
+            var taskLat = parseFloat($(item).data("lat"));
+            var taskLon = parseFloat($(item).data("lon"));
 
-            $('#TaskIdInput').val(TaskId);  //Passing parameters to the modal
-            $('#HuntIdInput').val(HuntId);
-            $('#TaskInput').text(Task); //Set the task question in the modal
-            console.log($('a[data-id="' + TaskId + '"] #status').text());
-            if ($('a[data-id="' + TaskId + '"] #status').text() == "Incomplete") { //Only show modal if task is incomplete
-                createTaskModal.show();
-            }
-        })
-    })
-    $("#createTaskModal").submit(function (event) { //On modal submit it passes the form data with huntid, taskid, and answer to an AJAX request in the locations controller
-        var formData = {
-            id: $("#HuntIdInput").val(),
-            taskid: $("#TaskIdInput").val(),
-            answer: $("#AnswerInput").val(),
-        };
-        $.ajax({
-            type: "POST",
-            url: "../../Locations/Validateanswer",
-            data: formData,
-            dataType: "json",
-            success: function (response) {
-                if (response.success) {
-                    $('#successMessageArea').html("Success! Task Completed.");
-                    $('#alertAreaSuccess').show();
-                    //console.log(formData.taskid);
-                    $('a[data-id="' + formData.taskid + '"] #status').text('Completed').css({ "color": "Green" }); //Change text to completed if success
-                    // After 500ms, fade out over 500ms
-                    setInterval(() => {
-                        $('#alertAreaSuccess').fadeOut(1500);
-                    }, 1500);
-                    setTimeout(() => {
-                        createTaskModal.hide();
-                    }, 1500);
+            getLocationAsync(function (coords) {
+                var distance = distanceToLocation(coords, taskLat, taskLon);
+
+                // Check if the user is within 50ft of the task
+                if (distance <= 50) {
+                    alert('You are within 50 feet of this task!')
+                    // Set values in the modal
+                    $('#TaskIdInput').val($(item).data("id"));
+                    $('#HuntIdInput').val($(item).data("huntid"));
+                    $('#TaskInput').text($(item).data("task"));
+
+                    // Show the modal only if the task is incomplete
+                    if ($('a[data-id="' + $(item).data("id") + '"] #status').text() == "Incomplete") {
+                        createTaskModal.show();
+                    }
+                } else {
+                    // Inform the user that they are not close enough to the task
+                    alert('You are not close enough to access this task.');
+                    console.log('You are not close enough to access this task.');
                 }
-                else {
-                    $('#failedMessageArea').html("Incorrect! Try again.");
-                    $('#alertAreaFailed').show();
-                    // After 500ms, fade out over 500ms
-                    setInterval(() => {
-                        $('#alertAreaFailed').fadeOut(1500);
-                    }, 1500); 
-                }
-            },
-        }).done(function (data) {
-            console.log(data);
+            }, function (error) {
+                console.error('Error getting user location:', error);
+                // Handle error
+            });
         });
-        event.preventDefault();
     });
-}());
+
+    // Call updateDistances with user coordinates here
+    getLocationAsync(function (userCoords) {
+        updateDistances(userCoords);
+    }, function (error) {
+        console.error('Error getting user location:', error);
+        // Handle error, e.g., inform the user or retry
+    });
+
+})();
+
+//event listener
+document.addEventListener('DOMContentLoaded', function () {
+    var taskItems = document.querySelectorAll('#btnCreateTask');
+
+
+    taskItems.forEach(function (taskItem) {
+        taskItem.addEventListener('click', function (event) {
+            var distance = parseFloat(taskItem.getAttribute('data-distance'));
+
+            if (distance <= 50) {
+                // Allow user to access the question
+                // Show the modal or perform other actions
+                createTaskModal.show();
+            } else {
+                // Inform the user that they are not close enough to the task
+                console.log('You are not close enough to access this task.');
+            }
+        });
+    });
+});
