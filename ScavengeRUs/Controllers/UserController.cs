@@ -154,16 +154,15 @@ namespace ScavengeRUs.Controllers
             return View(currentUser);
         }
 
-        public async Task<IActionResult> CreateUsers(string? filePath, string? serverUrl)
+        public async Task<IActionResult> CreateUsers()
         {
-            filePath = "Services/Users.csv";
-            serverUrl = $"{Request.Scheme}://{Request.Host}";
-            await _userRepo.CreateUsers(filePath, serverUrl);
+            //filePath = "Services/Users.csv";
+            //serverUrl = $"{Request.Scheme}://{Request.Host}";
+            //await _userRepo.CreateUsers(filePath, serverUrl);
 
-            
-
-            // Redirect to the Index action of the UsersController
-            return RedirectToAction("Manage");
+            return View();
         }
+
+        
     }
 }
