@@ -179,7 +179,6 @@
 -->
 <div class="div-center">
     <button class="btn-primary" onclick="requestCameraAccess()">Scan QR Code</button>
-
     <div id="cameraModal" class="camera-modal">
         <div class="camera-modal-content">
             <span class="close" onclick="closeCameraModal()">&times;</span>
@@ -187,10 +186,6 @@
         </div>
     </div>
 </div>
-
-    
-
-
 </div>
 
 
@@ -221,6 +216,8 @@
     Javascript code to determine of a user is within 50ft of a task, 
     as well as to request camera access and scan a QR code.
     -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.0.1/dist/jsQR.js"></script>
+
 
 <script>
     //Kept having issues with updateDistances function,
@@ -313,6 +310,7 @@ function requestCameraAccess() {
         const scanFrame = () => {
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            console.log(jsQR);
             const code = jsQR(imageData.data, imageData.width, imageData.height);
             if (code) {
                 handleQRCodeDetected(code.data);
@@ -323,7 +321,7 @@ function requestCameraAccess() {
 
         video.addEventListener('loadeddata', () => {
             canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.height = video.videoHeight;3
             scanFrame();
         });
     }
@@ -336,6 +334,7 @@ function requestCameraAccess() {
     function handleQRCodeDetected(qrCodeData) {
         // Handle the detected QR code data
         console.log('Detected QR Code:', qrCodeData);
+        window.location.href = qrCodeData;
         closeCameraModal();
     }
 
