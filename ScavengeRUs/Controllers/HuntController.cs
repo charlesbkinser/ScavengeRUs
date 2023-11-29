@@ -43,6 +43,7 @@ namespace ScavengeRUs.Controllers
         {
             return View();
         }
+
         /// <summary>
         /// www.localhost.com/hunt/create This is the post method for creating a hunt
         /// </summary>
@@ -333,6 +334,26 @@ namespace ScavengeRUs.Controllers
         {
             _huntRepo.Update(id, hunt);
             return RedirectToAction("Index");
+        }
+        /// <summary>
+        /// This method associates ViewMap with this controller and 
+        /// allows the view to access the current state (selected hunt)
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="huntid"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> ViewMap([Bind(Prefix = "Id")] int huntid)
+        {
+            var currentUser = await _userRepo.ReadAsync(User.Identity?.Name!);
+            var hunt = await _huntRepo.ReadHuntWithRelatedData(huntid);
+            ViewData["Hunt"] = hunt;
+
+            if (hunt == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View();
         }
     }
 }
