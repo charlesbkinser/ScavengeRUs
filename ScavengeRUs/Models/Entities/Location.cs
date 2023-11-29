@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Buffers.Text;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Drawing;
 
 namespace ScavengeRUs.Models.Entities
 {
@@ -29,6 +31,7 @@ namespace ScavengeRUs.Models.Entities
 
         [Display(Name = "QR Code")]
         public string? QRCode { get; set; }
+        public string? QRCodeText { get; set; }
         public string? Answer { get; set; }
         public ICollection<HuntLocation> LocationHunts { get; set; } = new List<HuntLocation>();
     }

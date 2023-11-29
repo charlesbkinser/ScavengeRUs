@@ -308,6 +308,9 @@ namespace ScavengeRUs.Data.Migrations
                     b.Property<string>("QRCode")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("QRCodeText")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Task")
                         .IsRequired()
                         .HasColumnType("TEXT");
