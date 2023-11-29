@@ -1,0 +1,84 @@
+﻿@model ScavengeRUs.Models.Entities.ApplicationUser
+@{
+    ViewData["Title"] = "Create Users";
+}
+
+<h1>Batch Create Users</h1>
+<input type="file" accept="csv" onchange="openFile(event)" />
+<br />
+
+<script>
+    var openFile = function (event) {
+        var reader = new FileReader();
+        reader.onload = (event) => {
+            this.processData(event.target.result)
+        }
+        reader.onerror = this.errorHandler;
+        //Read file into memory as UTF-8
+        reader.readAsText(event.target.files[0]);
+    }
+
+    //processData converts the csv file to an array of arrays
+    var processData = function (csv) {
+        var allTextLines = csv.split(/\r\n|\n/);
+        var lines = [];
+        while(allTextLines.length) {
+            lines.push(allTextLines.shift().split(','));
+        }
+        console.log(lines);
+        this.arraysToObjects(lines);
+        this.tableCreate(lines);
+    }
+
+    //arraysToObjects converts the arrays to an array of objects
+    var arraysToObjects = function (lines) {
+        object = {};
+        var i
+        var j
+        outputArray = []
+        for (j = 1; j < lines.length; j++) {
+            obj = {};
+            for (i = 0; i < lines[0].length; i++) {
+                obj[lines[0][i]] = lines[j][i];
+            }
+            outputArray.push(obj)
+        }
+        console.log(outputArray)
+    };
+
+    function tableCreate(lines) {
+        //body reference
+        var body = document.getElementsByTagName("body")[0];
+
+        //create elements <table> and a <tbody>
+        var tbl = document.createElement("table");
+        var tblBody = document.createElement("tbody");
+
+        //cells creation
+        for (var rows = 0; rows < lines.length; rows++) {
+            //table row creation
+            var row = document.createElement("tr");
+
+            for (var col = 0; col < lines[0].length; col++) {
+                //Create element <td> and text node
+                //Make text node the contents of <td> element
+                //Put <td> at end of the table row
+                var cell = document.createElement("td");
+                var cellText = document.createTextNode(lines[rows][col]);
+
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+            }
+            //row added to end of table body
+            tblBody.appendChild(row);
+        }
+        //append the <tbody> inside the <table>
+        tbl.appendChild(tblBody);
+        //put <table> in the <body>
+        body.appendChild(tbl);
+        //tbl border attribute
+        tbl.setAttribute("border", "2");
+    }
+
+    
+</script>
