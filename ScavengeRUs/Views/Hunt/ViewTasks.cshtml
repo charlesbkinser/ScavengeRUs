@@ -1,4 +1,6 @@
-﻿@model IEnumerable<ScavengeRUs.Models.Entities.Location>
+﻿
+
+@model IEnumerable<ScavengeRUs.Models.Entities.Location>
 @using Microsoft.AspNetCore.Identity
 @{
     var hunt = (Hunt?)ViewData["Hunt"];
@@ -167,7 +169,24 @@
     </div>
 
 </div>
-
+        
+<!-- 
+    This section of HTML represents a container for a QR code scanning button and a hidden camera modal.
+    The button, with the class "btn-primary," triggers the "requestCameraAccess" JavaScript function when 
+    clicked, initiating the camera access request.
+    The camera modal, initially hidden, is revealed when camera access is granted. It includes a video element 
+    for displaying the camera stream and a close button ("&times;") to close the modal.
+-->
+<div class="div-center">
+    <button class="btn-primary" onclick="requestCameraAccess()">Scan QR Code</button>
+    <div id="cameraModal" class="camera-modal">
+        <div class="camera-modal-content">
+            <span class="close" onclick="closeCameraModal()">&times;</span>
+            <video id="camera" autoplay></video>
+        </div>
+    </div>
+</div>
+</div>
 
 
 @*Sidebar*@
@@ -194,8 +213,11 @@
 </div>
 
 <!-- 
-    Javascript code to determine of a user is within 50ft of a task.
+    Javascript code to determine of a user is within 50ft of a task, 
+    as well as to request camera access and scan a QR code.
     -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.0.1/dist/jsQR.js"></script>
+
 
 <script>
     //Kept having issues with updateDistances function,
@@ -258,5 +280,74 @@
             });
         });
     });
+
+    /**
+ * Requests access to the user's camera and displays the camera stream in a modal.
+ */
+function requestCameraAccess() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+            const video = document.getElementById('camera');
+            video.srcObject = stream;
+            document.getElementById('cameraModal').style.display = 'block';
+            video.play();
+            startQRCodeScanner(video);
+        })
+        .catch((error) => {
+            console.error('Error accessing camera:', error);
+        });
+}
+
+    /**
+    * Starts the QR code scanner by continuously capturing frames from the camera stream.
+    * Invokes the handleQRCodeDetected function when a QR code is successfully detected.
+    * param {HTMLVideoElement} video - The video element displaying the camera stream.
+    */
+    function startQRCodeScanner(video) {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        const scanFrame = () => {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            console.log(jsQR);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+            if (code) {
+                handleQRCodeDetected(code.data);
+            } else {
+                requestAnimationFrame(scanFrame);
+            }
+        };
+
+        video.addEventListener('loadeddata', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;3
+            scanFrame();
+        });
+    }
+
+    /**
+    * Handles the detected QR code data.
+    * Logs the QR code data to the console and closes the camera modal.
+    * param {string} qrCodeData - The data extracted from the detected QR code.
+    */
+    function handleQRCodeDetected(qrCodeData) {
+        // Handle the detected QR code data
+        console.log('Detected QR Code:', qrCodeData);
+        window.location.href = qrCodeData;
+        closeCameraModal();
+    }
+
+    /**
+    * Closes the camera modal, pauses the video stream, and stops camera tracks.
+    */
+    function closeCameraModal() {
+        const video = document.getElementById('camera');
+        const modal = document.getElementById('cameraModal');
+        video.pause();
+        video.srcObject.getTracks().forEach(track => track.stop());
+        modal.style.display = 'none';
+    }
+
 </script>
 
