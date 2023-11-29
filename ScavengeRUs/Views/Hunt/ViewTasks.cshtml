@@ -48,13 +48,22 @@
                         <label class="col-sm-2 col-form-label">
                             Answer
                         </label>
+                    </div>
                         <div class="col-sm-10">
                             <input name="Answer" id="AnswerInput" class="form-control" />
-                            <input name="TaskId" hidden id="TaskIdInput" class="form-control" />
-                            <input name="HuntId" hidden id="HuntIdInput" class="form-control" />
                         </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-sm-2 col-form-label">
+                            QRCodeText
+                        </label>
                     </div>
-                </div>
+                    <div class="col-sm-10">
+                        <input name="QRCodeText" id="QRCodeText" class="form-control" />
+                        <input name="TaskId" hidden id="TaskIdInput" class="form-control" />
+                        <input name="HuntId" hidden id="HuntIdInput" class="form-control" />
+                    </div>
+                    </div>
+                
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">
                         Enter
@@ -105,14 +114,13 @@
             <hr />
 
         }
-        
+
         @foreach (var item in Model)
         {
 
             var img = $"/images/{item.Place}.jpg";
             <div id="taskitem">
-             
-                <a data-id="@item.Id" data-task="@item.Task" data-lat="@item.Lat" data-lon="@item.Lon" data-huntid="@hunt.Id" id="btnCreateTask" class="list-group-item list-group-item-action">
+                <a data-id="@item.Id" data-task="@item.Task" data-huntid="@hunt.Id" id="btnCreateTask" class="list-group-item list-group-item-action">
                     <div class="row" id="taskrow">
 
                         <div class="col">
@@ -142,16 +150,6 @@
 
                             </div>
                         </div>
-                        
-                        <div class="col">
-                            <div class="row" id="taskdistance">
-                                <span>Distance</span>
-                            </div>
-                            <div class="row" id="taskbody">
-                                <span class="distance-info"></span>
-                            </div>
-                        </div>
-
                         <div class="col">
                             <div class="row" id="taskAnswer">
                                 <span class="completeBtn">Complete <i class="fa-solid fa-angle-right"></i></span>
@@ -162,7 +160,6 @@
                 </a>
             </div>
         }
-        
 
     </div>
 
@@ -192,71 +189,3 @@
         <p>Time remaining: @timeRemaining</p>
     </div>
 </div>
-
-<!-- 
-    Javascript code to determine of a user is within 50ft of a task.
-    -->
-
-<script>
-    //Kept having issues with updateDistances function,
-    // needs to be defined outside of eventListener
-    function updateDistances(userCoords) {
-            taskItems.forEach(function (taskItem) {
-                var taskLat = parseFloat(taskItem.getAttribute('data-lat'));
-                var taskLon = parseFloat(taskItem.getAttribute('data-lon'));
-                var distanceInMeters = distanceToLocation(userCoords, taskLat, taskLon);
-                var distanceInFeet = metresToFeet(distanceInMeters);
-
-                // Now can display the current distance from a task in feet next to the task itself
-                var distanceElement = taskItem.querySelector('.distance-info');
-                distanceElement.textContent = distanceInFeet.toFixed(2) + ' feet';
-            });
-        }
-    document.addEventListener('DOMContentLoaded', function () {
-        var taskItems = document.querySelectorAll('#btnCreateTask');
-
-        
-        getLocationAsync(function (userCoords) {
-            // Handle the obtained user coordinates
-            console.log('User coordinates:', userCoords);
-
-            // Call updateDistances with the obtained user coordinates
-            updateDistances(userCoords);
-        }, function (error) {
-            console.error('Error getting user location:', error);
-            // Handle error
-        });
-
-
-        taskItems.forEach(function (taskItem) {
-            taskItem.addEventListener('click', function (event) {
-                var taskLat = parseFloat(taskItem.getAttribute('data-lat'));
-                var taskLon = parseFloat(taskItem.getAttribute('data-lon'));
-
-                getLocationAsync(function (coords) {
-                    // Call updateDistances with user coordinates when available
-                    updateDistances(coords);
-
-                    var distance = distanceToLocation(coords, taskLat, taskLon);
-
-                    if (distance <= 50) {
-                        // User is close enough to the task, allow them to answer
-                        // Show the modal or perform other actions
-                        console.log("User is close enough to the task.");
-                        $('#TaskIdInput').val(taskItem.getAttribute('data-id'));
-                        $('#HuntIdInput').val(taskItem.getAttribute('data-huntid'));
-                        $('#TaskInput').text(taskItem.getAttribute('data-task'));
-                        createTaskModal.show();
-                    } else {
-                        // Inform the user that they are not close enough to the task
-                        console.log('You are not close enough to access this task.');
-                    }
-                }, function (error) {
-                    console.error('Error getting user location:', error);
-                    // Handle error, e.g., inform the user or retry
-                });
-            });
-        });
-    });
-</script>
-
