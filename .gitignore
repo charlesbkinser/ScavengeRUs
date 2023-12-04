@@ -361,5 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/ScavengeRUs/ScavengeRUS.db-shm
-/ScavengeRUs/ScavengeRUS.db-wal
+
+# Database
+*.db
