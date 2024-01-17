@@ -33,8 +33,13 @@
             </div>
             <div class="form-group">
                 <label asp-for="QRCode" class="control-label"></label>
-                <input asp-for="QRCode" readonly class="form-control" />
+                <img src="data:image/png;base64, @Model.QRCode" alt="QR Code" />
                 <span asp-validation-for="QRCode" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="QRCodeText" class="control-label"></label>
+                <p>@Model.QRCodeText</p>
+                <span asp-validation-for="QRCodeText" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Answer" class="control-label"></label>

@@ -1,0 +1,234 @@
+﻿@model ScavengeRUs.Models.Entities.ApplicationUser
+@{
+    ViewData["Title"] = "CreateUsers";
+}
+@if (ViewData["ErrorList"] is List<string> errorList && errorList.Any())
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in errorList)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </div>
+}
+
+
+
+<h1>Batch Create Users</h1>
+<button onclick="openModal()">Upload CSV File</button> <!-- Button to open modal -->
+
+<!-- File Upload Modal -->
+<div id="fileUploadModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span> <!-- Close button for modal -->
+        <h2>Upload File</h2>
+        <input type="file" id="fileInput" accept=".csv" onchange="openFile(event)">
+        <button onclick="submitData()">Submit Data</button> <!-- Button to submit data -->
+    </div>
+</div>
+<div id="error-message" style="display: none; color: red;"></div> <!-- Error message display -->
+
+<div id="loadingSpinner" style="display: none;">
+    <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<script>
+
+
+
+    // Get the modal
+    var modal = document.getElementById("fileUploadModal");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    var outputArray = []; // Global array to store processed data
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    // Function to open the modal
+    function openModal() {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+        modal.style.display = "none";
+    };
+
+    var openFile = function (event) {
+        var reader = new FileReader();
+        reader.onload = (event) => {
+            this.processData(event.target.result);
+        };
+        reader.onerror = function (event) {
+            displayErrorMessage("File read error: " + event.target.error.message);
+        };
+        //Read file into memory as UTF-8
+        reader.readAsText(event.target.files[0]);
+    };
+
+    var processData = function (csv) {
+        try {
+            var allTextLines = csv.split(/\r\n|\n/);
+            var lines = [];
+            for (let i = 1; i < allTextLines.length; i++) {
+                let line = allTextLines[i].trim();
+                if (line === "") continue; // Skip empty lines
+
+                let values = line.split(",");
+                if (
+                    values.length === 5 &&
+                    validateEmail(values[3]) &&
+                    validatePhoneNumber(values[2])
+                ) {
+                    lines.push(values);
+                } else {
+                    throw new Error("Invalid data format at line " + (i + 1) + ": " + line);
+                }
+            }
+            console.log(lines);
+            this.arraysToObjects(lines);
+            this.tableCreate(lines);
+        } catch (error) {
+            console.error("Error processing CSV data: ", error);
+            displayErrorMessage("Error processing CSV file: " + error.message);
+        }
+    };
+
+    //arraysToObjects converts the arrays to an array of objects
+    var arraysToObjects = function (lines) {
+        object = {};
+        var i;
+        var j;
+        outputArray = [];
+        for (j = 1; j < lines.length; j++) {
+            obj = {};
+            for (i = 0; i < lines[0].length; i++) {
+                obj[lines[0][i]] = lines[j][i];
+            }
+            outputArray.push(obj);
+        }
+        console.log(outputArray);
+    };
+
+    // Email validation function
+    function validateEmail(email) {
+        var re = /^[^@@\s]+@@[^@@\s]+\.[^@@\s]+$/;
+        return re.test(email);
+    }
+
+    // Phone number validation function (for US numbers)
+    function validatePhoneNumber(number) {
+        var re = /^\d{10}$/;
+        return re.test(number);
+    }
+
+    // Display error message
+    function displayErrorMessage(message) {
+        var errorMessageElement = document.getElementById("error-message");
+        if (errorMessageElement) {
+            errorMessageElement.innerText = message;
+            errorMessageElement.style.display = "block";
+        } else {
+            alert(message);
+        }
+    }
+
+    function tableCreate(lines) {
+        //body reference
+        var body = document.getElementsByTagName("body")[0];
+
+        //create elements <table> and a <tbody>
+        var tbl = document.createElement("table");
+        var tblBody = document.createElement("tbody");
+
+        //cells creation
+        for (var rows = 0; rows < lines.length; rows++) {
+            //table row creation
+            var row = document.createElement("tr");
+
+            for (var col = 0; col < lines[0].length; col++) {
+                //Create element <td> and text node
+                //Make text node the contents of <td> element
+                //Put <td> at end of the table row
+                var cell = document.createElement("td");
+                var cellText = document.createTextNode(lines[rows][col]);
+
+                cell.appendChild(cellText);
+                row.appendChild(cell);
+            }
+            //row added to end of table body
+            tblBody.appendChild(row);
+        }
+        //append the <tbody> inside the <table>
+        tbl.appendChild(tblBody);
+        //put <table> in the <body>
+        body.appendChild(tbl);
+        //tbl border attribute
+        tbl.setAttribute("border", "2");
+    }
+
+    var submitData = function () {
+        var fileInput = document.getElementById("fileInput");
+        var file = fileInput.files[0];
+
+        if (!file) {
+            displayErrorMessage("Please select a file to upload.");
+            return;
+        }
+
+        // Show progress indicator (example: a loading spinner)
+        showProgressIndicator(true);
+
+        var formData = new FormData();
+        formData.append("uploadedFile", file);
+
+        fetch("/User/CreateUsers", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => {
+                // Hide progress indicator
+                showProgressIndicator(false);
+
+                if (!response.ok) {
+                    throw new Error("Network response was not ok: " + response.statusText);
+                }
+
+                // Check if the response is JSON
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    return response.json().then((data) => {
+                        console.log("Success:", data);
+                        alert(data.message || "Users successfully created");
+                    });
+                } else {
+                    return response.text().then((text) => {
+                        // Handle non-JSON response (like HTML)
+                        document.body.innerHTML = text;
+                    });
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert(error.message || "Error submitting data");
+            });
+    };
+
+    // Show or hide progress indicator
+
+    function showProgressIndicator(show) {
+        var spinner = document.getElementById("loadingSpinner");
+    }
+
+</script>

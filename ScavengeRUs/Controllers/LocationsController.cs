@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Routing;
 using ScavengeRUs.Services;
 
+//bryson testing
 namespace ScavengeRUs.Controllers
 {
      //makes sure that only admin can see this page
@@ -134,7 +135,7 @@ namespace ScavengeRUs.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,HuntId,Place,Lat,Lon,Task,AccessCode,QRCode,Answer")] Location location)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,HuntId,Place,Lat,Lon,Task,AccessCode,QRCode,QRCodeText,Answer")] Location location)
         {
             if (id != location.Id)
             {
@@ -230,11 +231,11 @@ namespace ScavengeRUs.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize(Roles = "Admin, Player")]
-        public async Task<IActionResult> ValidateAnswer([FromForm]int id, int taskid, string answer)
+        public async Task<IActionResult> ValidateAnswer([FromForm]int id, int taskid, string answer, string qrcodetext)
         {
             var currentUser = await _userRepo.ReadAsync(User.Identity?.Name!);                              //gets current user
             var location = await _context.Location.FirstOrDefaultAsync(m => m.Id == taskid);                //gets the task
-            if (answer != null && answer.Equals(location?.Answer, StringComparison.OrdinalIgnoreCase))      //check is answer matches
+            if (answer != null && answer.Equals(location?.Answer, StringComparison.OrdinalIgnoreCase) || qrcodetext != null && qrcodetext.Equals(location?.QRCodeText, StringComparison.OrdinalIgnoreCase))      //check is answer matches
             {
                 currentUser?.TasksCompleted!.Add(location); //Update the players completed tasks
                 await _context.SaveChangesAsync();          

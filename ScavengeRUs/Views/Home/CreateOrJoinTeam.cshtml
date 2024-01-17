@@ -1,0 +1,42 @@
+﻿
+
+@{
+    ViewData["Title"] = "Create or Join a Team";
+}
+
+<h1>Create or Join a Team</h1>
+<div class="btn-div">
+    <button type="button" id="btn-Create" class="w-100 btn btn-lg btn-primary">Create Team</button>
+</div>
+<div class="btn-div">
+    <button type="button" id="btn-Join" class="w-100 btn btn-lg btn-primary" onclick="openJoinTeamDialog()">Join Team</button>
+</div>
+
+    <!--Pop up window dialog  -->
+<dialog id="joinTeamDialog">
+    <label for="teamName">Enter Team Name:</label>
+    <input type="text" id="teamName" name="teamName" />
+    <br /><br />
+    <button type="button" onclick="submitTeam()">Submit</button>
+    <button type="button" onclick="closeJoinTeamDialog()">Cancel</button>
+</dialog>
+
+<script>
+    function openJoinTeamDialog() {
+        // Show the dialog
+        document.getElementById('joinTeamDialog').showModal();
+    }
+
+    function closeJoinTeamDialog() {
+        // Close the dialog
+        document.getElementById('joinTeamDialog').close();
+    }
+
+    function submitTeam() {
+        // Get the team name entered by the user
+        var teamName = document.getElementById('teamName').value;
+
+        // Close the dialog
+        closeJoinTeamDialog();
+    }
+</script>
